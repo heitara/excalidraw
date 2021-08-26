@@ -11,6 +11,7 @@ import { unstable_batchedUpdates } from "react-dom";
 import { isDarwin } from "./keys";
 
 export const SVG_NS = "http://www.w3.org/2000/svg";
+export const SVG_NS_XLINK = "http://www.w3.org/1999/xlink";
 
 let mockDateTime: string | null = null;
 

@@ -24,6 +24,7 @@ import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
 import {
   SVG_NS,
+  SVG_NS_XLINK,
   distance,
   getFontString,
   getFontFamilyString,
@@ -31,7 +32,7 @@ import {
 } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
-import { Zoom } from "../types";
+import { File, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
 import getFreeDrawShape from "perfect-freehand";
 import { MAX_DECIMALS_FOR_SVG_EXPORT, THEME_FILTER } from "../constants";
@@ -690,6 +691,7 @@ export const renderElementToSvg = (
   element: NonDeletedExcalidrawElement,
   rsvg: RoughSVG,
   svgRoot: SVGElement,
+  file: File | undefined,
   offsetX?: number,
   offsetY?: number,
 ) => {
@@ -783,6 +785,21 @@ export const renderElementToSvg = (
       path.setAttribute("d", getFreeDrawSvgPath(element));
       node.appendChild(path);
       svgRoot.appendChild(node);
+      break;
+    }
+    case "image": {
+      if (file) {
+        const image = svgRoot.ownerDocument!.createElementNS(
+          SVG_NS_XLINK,
+          "image",
+        );
+        image.setAttribute("xlink:href", file.data);
+        image.setAttribute("width", `${element.width}`);
+        image.setAttribute("height", `${element.height}`);
+        image.setAttribute("y", `${offsetY || 0}`);
+        image.setAttribute("x", `${offsetX || 0}`);
+        svgRoot.appendChild(image);
+      }
       break;
     }
     default: {
