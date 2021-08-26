@@ -1,9 +1,12 @@
 import rough from "roughjs/bin/rough";
-import { NonDeletedExcalidrawElement } from "../element/types";
+import {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "../element/types";
 import { getCommonBounds } from "../element/bounds";
 import { renderScene, renderSceneToSvg } from "../renderer/renderScene";
-import { distance, SVG_NS } from "../utils";
-import { AppState } from "../types";
+import { distance, SVG_NS, SVG_NS_XLINK } from "../utils";
+import { AppState, File } from "../types";
 import { DEFAULT_EXPORT_PADDING, THEME_FILTER } from "../constants";
 import { getDefaultAppState } from "../appState";
 import { serializeAsJSON } from "../data/json";
@@ -89,6 +92,7 @@ export const exportToSvg = async (
     viewBackgroundColor: string;
     exportWithDarkMode?: boolean;
     exportEmbedScene?: boolean;
+    files?: Record<ExcalidrawElement["id"], File>;
   },
 ): Promise<SVGSVGElement> => {
   const {
@@ -115,6 +119,7 @@ export const exportToSvg = async (
   const svgRoot = document.createElementNS(SVG_NS, "svg");
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", SVG_NS);
+  svgRoot.setAttribute("xmlns:xlink", SVG_NS_XLINK);
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
   svgRoot.setAttribute("width", `${width * exportScale}`);
   svgRoot.setAttribute("height", `${height * exportScale}`);
@@ -151,7 +156,7 @@ export const exportToSvg = async (
   }
 
   const rsvg = rough.svg(svgRoot);
-  renderSceneToSvg(elements, rsvg, svgRoot, {
+  renderSceneToSvg(elements, rsvg, svgRoot, appState.files, {
     offsetX: -minX + exportPadding,
     offsetY: -minY + exportPadding,
   });

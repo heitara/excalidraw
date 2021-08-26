@@ -2,7 +2,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import { RoughSVG } from "roughjs/bin/svg";
 import oc from "open-color";
 
-import { AppState, Zoom } from "../types";
+import { AppState, File, Zoom } from "../types";
 import {
   ExcalidrawElement,
   NonDeletedExcalidrawElement,
@@ -50,6 +50,7 @@ import {
 import { viewportCoordsToSceneCoords, supportsEmoji } from "../utils";
 import { UserIdleState } from "../types";
 import { THEME_FILTER } from "../constants";
+import { isInitializedImageElement } from "../element/typeChecks";
 
 const hasEmojiSupport = supportsEmoji();
 
@@ -809,6 +810,7 @@ export const renderSceneToSvg = (
   elements: readonly NonDeletedExcalidrawElement[],
   rsvg: RoughSVG,
   svgRoot: SVGElement,
+  files?: Record<ExcalidrawElement["id"], File>,
   {
     offsetX = 0,
     offsetY = 0,
@@ -828,6 +830,9 @@ export const renderSceneToSvg = (
           element,
           rsvg,
           svgRoot,
+          isInitializedImageElement(element)
+            ? files?.[element.imageId]
+            : undefined,
           element.x + offsetX,
           element.y + offsetY,
         );
